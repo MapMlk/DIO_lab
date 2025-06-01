@@ -26,7 +26,7 @@ def cpf_valido(cpf):
     return None
 
 def nome_valido(nome):
-    return bool(re.match(r"^[A-Za-z\s]+$", nome))
+    return bool(re.match(r"^[\w\sÀ-ÿ]+$", nome))
 
 def nascimento_valido(nascimento):
     return bool(re.match(r"^\d{2}/\d{2}/\d{4}$", nascimento))
@@ -56,7 +56,11 @@ def criar_usuario(cpf, nome, nascimento,senha):  ## função que cria um usuári
     print(f"Usuário {nome} criado com sucesso.")
 
 def criar_conta(cpf):  ## função que cria uma conta
-    usuario = usuarios.get(cpf)  ## busca o usuário pelo CPF
+    cpf_limpo = cpf_valido(cpf)  ## valida e limpa o CPF
+    if not cpf_limpo:
+        print("CPF inválido. Deve conter 11 dígitos.")
+        return False
+    usuario = usuarios.get(cpf_limpo)  ## busca o usuário pelo CPF limpo
     if usuario is None:  ## verifica se o CPF está cadastrado
         print("Usuário não encontrado. Crie um usuário primeiro.")
         return False
@@ -77,6 +81,9 @@ def listar_contas(cpf):  ## função que lista as contas de um usuário
         return True
 
 def depositar(numero_conta, senha, valor):  ## função que deposita um valor na conta
+    if numero_conta not in contas_ativas:
+        print("Conta não encontrada.")
+        return False
     conta = contas_ativas.get(numero_conta)
     if not conta_valida(numero_conta, senha):
         return False
@@ -125,36 +132,32 @@ while True:
     opcao = input("Escolha uma operação: ")
 
     if opcao == "1":
-        cpf = input("Informe o CPF do usuário: ")
-        nome = input("Informe o nome do usuário: ")
-        nascimento = input("Informe a data de nascimento (DD/MM/AAAA): ")
-        senha = input("Informe a senha do usuário: ")
-        criar_usuario(cpf, nome, nascimento, senha)
-    elif opcao == "2":
-        cpf = input("Informe o CPF do usuário: ")
         numero_conta = input("Informe o número da conta: ")
         senha = input("Informe a senha da conta: ")
         valor = float(input("Informe o valor do depósito: "))
         depositar(numero_conta, senha, valor)
-    elif opcao == "3":
-        cpf = input("Informe o CPF do usuário: ")
+    elif opcao == "2":
         numero_conta = input("Informe o número da conta: ")
         senha = input("Informe a senha da conta: ")
+        valor = float(input("Informe o valor do saque: "))
         sacar(numero_conta, senha, valor)
-    elif opcao == "4":
-        cpf = input("Informe o CPF do usuário: ")
+    elif opcao == "3":
         numero_conta = input("Informe o número da conta: ")
         senha = input("Informe a senha da conta: ")
         extrato_bancario(numero_conta, senha)
+    elif opcao == "4":
+        cpf = input("Informe o CPF do usuário (apenas números): ")
+        nome = input("Informe o nome do usuário: ")
+        nascimento = input("Informe a data de nascimento (DD/MM/AAAA): ")
+        senha = input("Crie uma senha para o usuário: ")
+        criar_usuario(cpf, nome, nascimento,senha)
     elif opcao == "5":
-        cpf = input("Informe o CPF do usuário: ")
+        cpf = input("Informe o CPF do usuário (apenas números): ")
         criar_conta(cpf)
     elif opcao == "6":
-        cpf = input("Informe o CPF do usuário para listar as contas: ")
+        cpf = input("Informe o CPF do usuário (apenas números): ")
         listar_contas(cpf)
     elif opcao == "0":
        break
     else:
        print("Opção inválida. Tente novamente.")
-    
-
